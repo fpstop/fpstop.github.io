@@ -6,24 +6,7 @@
     <description>Recent content on 徐锦平的博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 12 Mar 2017 17:53:47 +0800</lastBuildDate>
     <atom:link href="http://www.fpstop.com/index.xml" rel="self" type="application/rss+xml" />
-    
-    <item>
-      <title>学习markdownb标记语言</title>
-      <link>http://www.fpstop.com/md/%E5%AD%A6%E4%B9%A0markdownb%E6%A0%87%E8%AE%B0%E8%AF%AD%E8%A8%80/</link>
-      <pubDate>Sun, 12 Mar 2017 17:53:47 +0800</pubDate>
-      
-      <guid>http://www.fpstop.com/md/%E5%AD%A6%E4%B9%A0markdownb%E6%A0%87%E8%AE%B0%E8%AF%AD%E8%A8%80/</guid>
-      <description>
-
-&lt;h1 id=&#34;一级标题-一级标题&#34;&gt;一级标题      &amp;ldquo;# 一级标题&amp;rdquo;&lt;/h1&gt;
-
-&lt;h2 id=&#34;二级标题-二级标题&#34;&gt;二级标题     &amp;ldquo;## 二级标题&amp;rdquo;&lt;/h2&gt;
-
-&lt;h3 id=&#34;三级标题-三级标题&#34;&gt;三级标题    &amp;ldquo;### 三级标题&amp;rdquo;&lt;/h3&gt;
-</description>
-    </item>
     
   </channel>
 </rss>
