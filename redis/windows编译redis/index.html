@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="Hugo 0.16" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <link rel='stylesheet' href='//fonts.googleapis.com/css?family=Open+Sans|Marcellus+SC'>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/solarized_dark.min.css">
+    <link rel="stylesheet" href="http://www.fpstop.com/css/styles.css">
+    <link rel="stylesheet" href="http://www.fpstop.com/css/custom.css">
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="http://www.fpstop.com//index.xml">
+
+    
+    <title>windows编译redis - 徐锦平的博客</title>
+    <meta property='og:title' content="windows编译redis - 徐锦平的博客">
+    <meta property="og:type" content="article">
+    
+
+    <meta property="og:url" content="http://www.fpstop.com/redis/windows%E7%BC%96%E8%AF%91redis/">
+    
+    
+
+  </head>
+
+  <body>
+
+    <header class="site">
+      <nav class="navbar navbar-default">
+        <div class="container">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="http://www.fpstop.com/">徐锦平的博客</a>
+          </div>
+
+          <div id="navbar" class="collapse navbar-collapse">
+            
+          </div>
+
+        </div>
+      </nav>
+	  
+
+	 <script>
+		var _hmt = _hmt || [];
+		(function() {
+		  var hm = document.createElement("script");
+		hm.src = "//hm.baidu.com/hm.js?d932a7da04ab8d1a98eb944bbe989c74";
+		  var s = document.getElementsByTagName("script")[0]; 
+		  s.parentNode.insertBefore(hm, s);
+		})();
+	</script>
+
+	  
+	<script>
+		(function(){
+			var bp = document.createElement('script');
+			var curProtocol = window.location.protocol.split(':')[0];
+			if (curProtocol === 'https') {
+				bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';       
+			}
+			else {
+				bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+			}
+			var s = document.getElementsByTagName("script")[0];
+			s.parentNode.insertBefore(bp, s);
+		})();
+	</script>
+	
+	
+    </header>
+
+    <div class="site">
+      <div class="container">
+
+
+
+<div class="single">
+
+  <div class="row">
+    <div class="col-md-8">
+
+      <article class="single" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+        <meta itemprop="mainEntityOfPage"  itemType="https://schema.org/WebPage" content="http://www.fpstop.com/"/>
+        <meta itemprop="dateModified" content="2017-03-12T19:31:50&#43;08:00">
+        <meta itemprop="headline" content="windows编译redis">
+        <meta itemprop="description" content="假设大家都已经了解redis了，本文只讲redis的windows上的编译。
+">
+        <meta itemprop="url" content="http://www.fpstop.com/redis/windows%E7%BC%96%E8%AF%91redis/">
+        <div itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
+          <meta itemprop="url" content="http://www.fpstop.com/images/default.jpg" />
+          <meta itemprop="width" content="800">
+          <meta itemprop="height" content="800">
+        </div>
+        <div itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+          <div itemprop="logo" itemscope itemtype="https://schema.org/ImageObject">
+            <meta itemprop="url" content="http://www.fpstop.com/images/logo.jpg">
+            <meta itemprop="width" content="100">
+            <meta itemprop="height" content="100">
+          </div>
+          <meta itemprop="name" content="徐锦平的博客">
+        </div>
+        <div itemprop="author" itemscope itemtype="https://schema.org/Person">
+          <meta itemprop="name" content="">
+        </div>
+
+        <header class="article-header">
+          <time itemprop="datePublished" pubdate="pubdate" datetime="2017-03-12T19:31:50&#43;08:00">Sun, Mar 12, 2017</time>
+          <h1 class="article-title">windows编译redis</h1>
+        </header>
+
+        <div class="article-body" itemprop="articleBody">
+          
+
+<p>假设大家都已经了解redis了，本文只讲redis的windows上的编译。</p>
+
+<h1 id="1-windows编译redis">1.windows编译redis</h1>
+
+<h2 id="1-1下载">1.1下载</h2>
+
+<p>微软维护了一个windows版本，地址在<a href="https://github.com/MSOpenTech/redis">https://github.com/MSOpenTech/redis</a></p>
+
+<blockquote>
+<p>The Redis project does not officially support Windows.
+However, the Microsoft Open Tech group develops and maintains this Windows port targeting Win64.</p>
+</blockquote>
+
+<p>redis官方不支持windows编译，但是微软维护了一个windows版本。既然这个出现在redis官网上，想必也是认可的。最起码用来研究学习时没问题的。</p>
+
+<h2 id="1-2-编译">1.2 编译</h2>
+
+<p>可以用vs2015 直接打开工程文件
+- server：&rdquo;\redis-2.8_win\msvs\RedisServer.sln&rdquo;
+- Hiredis异步例子：&rdquo;\redis-2.8_win\msvs\HiredisExample\HiredisExample.sln&rdquo;</p>
+
+<p>server 很顺利的编译通过，但是Hiredis异步例子编译时报了一个错误,是个类型重定义错误。</p>
+
+<pre><code>&gt;\src\win32_interop\win32_types.h(37): error C2371: 'off_t': redefinition; different basic types
+&gt;c:\program files (x86)\windows kits\10\include\10.0.10240.0\ucrt\sys\types.h(42): note: see declaration of 'off_t'
+</code></pre>
+
+<p>很明显，是自己定义的类型和默认的类型重复了。打开 win32_types.h 文件看看：</p>
+
+<pre><code>/* The Posix version of Redis defines off_t as 64-bit integers, so we do the same.
+ * On Windows, these types are defined as 32-bit in sys/types.h under and #ifndef _OFF_T_DEFINED
+ * So we define _OFF_T_DEFINED at the project level, to make sure that that definition is never included.
+ * If you get an error about re-definition, make sure to include this file before sys/types.h, or any other
+ * file that include it (eg wchar.h).
+ * _off_t is also defined #ifndef _OFF_T_DEFINED, so we need to define it here.
+ * It is used by the CRT internally (but not by Redis), so we leave it as 32-bit.
+ */
+</code></pre>
+
+<p>原来，微软团队发现redis在Posix体系下，off_t被定义成64位，而在windows下被sys\types.h文件定义成32位。</p>
+
+<p>sys\types.h</p>
+
+<pre><code>#ifndef _OFF_T_DEFINED
+    #define _OFF_T_DEFINED
+
+    typedef long _off_t; // file offset value
+
+    #if !__STDC__
+        typedef _off_t off_t;
+    #endif
+#endif
+</code></pre>
+
+<p>然后windows团队就在工程属性里定义了_OFF_T_DEFINED （So we define _OFF_T_DEFINED at the project level），使32位的不生效，用自己定义在文件的，但是为什么还是出现重定义了呢？</p>
+
+<p>因为他们忘记在工程属性里定义啦，加回来就行拉。。。忘记定义了这个宏，所以默认的就生效了，自己也定义一份，当然编不过了。。</p>
+
+        </div>
+
+
+        <aside>
+          
+          
+          
+        </aside>
+
+      </article>
+
+    </div>
+    <div class="col-md-4">
+      
+<aside class="site">
+
+
+  
+  <div class="panel panel-default">
+
+    <div class="list-group">
+      
+      <a href="http://www.fpstop.com/categories/redis" class="list-group-item">redis</a>
+      
+    </div>
+  </div>
+  
+  <div class="panel panel-default">
+
+    <div class="list-group">
+      
+    </div>
+  </div>
+  
+  
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">最近更新</h2>
+    </div>
+    <div class="list-group">
+      
+      <a href="http://www.fpstop.com/redis/windows%E7%BC%96%E8%AF%91redis/" class="list-group-item">windows编译redis</a>
+      
+    </div>
+  </div>
+
+  
+
+</aside>
+
+
+    </div>
+  </div>
+
+</div>
+
+      </div>
+    </div>
+
+    <footer class="site">
+      <div class="container">
+        <p>&copy; 2017 徐锦平的博客</p>
+        <p>Powered by fpstop.</p>
+      </div>
+    </footer>
+
+    <script src="//code.jquery.com/jquery-2.2.1.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+
+  </body>
+</html>
+
