@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Redis on 徐锦平的博客</title>
-    <link>http://www.fpstop.com/redis/</link>
-    <description>Recent content in Redis on 徐锦平的博客</description>
+    <title>网络编程 on 徐锦平的博客</title>
+    <link>http://www.fpstop.com/categories/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/</link>
+    <description>Recent content in 网络编程 on 徐锦平的博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 24 Mar 2017 21:47:04 +0800</lastBuildDate>
-    <atom:link href="http://www.fpstop.com/redis/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://www.fpstop.com/categories/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>socket的属性设置 （持续更新）</title>
@@ -154,74 +154,6 @@ setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &amp;amp;val, sizeof(val))
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;上文中的例子&lt;a href=&#34;https://github.com/xjp342023125/Code/blob/master/common/XSock.hpp&#34;&gt;XSock.hpp&lt;/a&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>windows编译redis</title>
-      <link>http://www.fpstop.com/redis/windows%E7%BC%96%E8%AF%91redis/</link>
-      <pubDate>Sun, 12 Mar 2017 19:31:50 +0800</pubDate>
-      
-      <guid>http://www.fpstop.com/redis/windows%E7%BC%96%E8%AF%91redis/</guid>
-      <description>
-
-&lt;p&gt;假设大家都已经了解redis了，本文只讲redis的windows上的编译。&lt;/p&gt;
-
-&lt;h1 id=&#34;1-windows编译redis&#34;&gt;1.windows编译redis&lt;/h1&gt;
-
-&lt;h2 id=&#34;1-1下载&#34;&gt;1.1下载&lt;/h2&gt;
-
-&lt;p&gt;微软维护了一个windows版本，地址在&lt;a href=&#34;https://github.com/MSOpenTech/redis&#34;&gt;https://github.com/MSOpenTech/redis&lt;/a&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;The Redis project does not officially support Windows.
-However, the Microsoft Open Tech group develops and maintains this Windows port targeting Win64.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;redis官方不支持windows编译，但是微软维护了一个windows版本。既然这个出现在redis官网上，想必也是认可的。最起码用来研究学习时没问题的。&lt;/p&gt;
-
-&lt;h2 id=&#34;1-2-编译&#34;&gt;1.2 编译&lt;/h2&gt;
-
-&lt;p&gt;可以用vs2015 直接打开工程文件
-- server：&amp;rdquo;\redis-2.8_win\msvs\RedisServer.sln&amp;rdquo;
-- Hiredis异步例子：&amp;rdquo;\redis-2.8_win\msvs\HiredisExample\HiredisExample.sln&amp;rdquo;&lt;/p&gt;
-
-&lt;p&gt;server 很顺利的编译通过，但是Hiredis异步例子编译时报了一个错误,是个类型重定义错误。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;gt;\src\win32_interop\win32_types.h(37): error C2371: &#39;off_t&#39;: redefinition; different basic types
-&amp;gt;c:\program files (x86)\windows kits\10\include\10.0.10240.0\ucrt\sys\types.h(42): note: see declaration of &#39;off_t&#39;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;很明显，是自己定义的类型和默认的类型重复了。打开 win32_types.h 文件看看：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;/* The Posix version of Redis defines off_t as 64-bit integers, so we do the same.
- * On Windows, these types are defined as 32-bit in sys/types.h under and #ifndef _OFF_T_DEFINED
- * So we define _OFF_T_DEFINED at the project level, to make sure that that definition is never included.
- * If you get an error about re-definition, make sure to include this file before sys/types.h, or any other
- * file that include it (eg wchar.h).
- * _off_t is also defined #ifndef _OFF_T_DEFINED, so we need to define it here.
- * It is used by the CRT internally (but not by Redis), so we leave it as 32-bit.
- */
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;原来，微软团队发现redis在Posix体系下，off_t被定义成64位，而在windows下被sys\types.h文件定义成32位。&lt;/p&gt;
-
-&lt;p&gt;sys\types.h&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;#ifndef _OFF_T_DEFINED
-    #define _OFF_T_DEFINED
-
-    typedef long _off_t; // file offset value
-
-    #if !__STDC__
-        typedef _off_t off_t;
-    #endif
-#endif
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;然后windows团队就在工程属性里定义了_OFF_T_DEFINED （So we define _OFF_T_DEFINED at the project level），使32位的不生效，用自己定义在文件的，但是为什么还是出现重定义了呢？&lt;/p&gt;
-
-&lt;p&gt;因为他们忘记在工程属性里定义啦，加回来就行拉。。。忘记定义了这个宏，所以默认的就生效了，自己也定义一份，当然编不过了。。&lt;/p&gt;
 </description>
     </item>
     

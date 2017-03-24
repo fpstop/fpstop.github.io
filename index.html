@@ -88,6 +88,27 @@
       
       <article class="li">
   <header>
+    <div class="date">Fri, Mar 24, 2017</div>
+    <div class="title"><a href="http://www.fpstop.com/redis/learn_src1/">socket的属性设置 （持续更新）</a></div>
+  </header>
+  <div class="body"><p>今天看redis代码时，发现了如下代码，设置阻塞socket的读写超时时间，仔细一看就是简单的设置了一下socket的属性，索性把socket一些属性总结一下。</p>
+
+<pre><code>/* Set read/write timeout on a blocking socket. */
+int redisSetTimeout(redisContext *c, const struct timeval tv)
+</code></pre>
+</div>
+
+  
+  <footer>
+    <a href="http://www.fpstop.com/redis/learn_src1/" class="btn btn-default">Read More…</a>
+  </footer>
+  
+</article>
+<hr>
+
+      
+      <article class="li">
+  <header>
     <div class="date">Tue, Mar 21, 2017</div>
     <div class="title"><a href="http://www.fpstop.com/life/hongkong_plan/">香港旅游计划</a></div>
   </header>
@@ -157,6 +178,8 @@
       
       <a href="http://www.fpstop.com/categories/%E7%94%9F%E6%B4%BB" class="list-group-item">生活</a>
       
+      <a href="http://www.fpstop.com/categories/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B" class="list-group-item">网络编程</a>
+      
     </div>
   </div>
   
@@ -173,6 +196,8 @@
       <h2 class="panel-title">最近更新</h2>
     </div>
     <div class="list-group">
+      
+      <a href="http://www.fpstop.com/redis/learn_src1/" class="list-group-item">socket的属性设置 （持续更新）</a>
       
       <a href="http://www.fpstop.com/life/hongkong_plan/" class="list-group-item">香港旅游计划</a>
       
