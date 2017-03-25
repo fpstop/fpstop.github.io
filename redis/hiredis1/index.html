@@ -14,12 +14,12 @@
     <link rel="alternate" type="application/rss+xml" title="RSS" href="http://www.fpstop.com//index.xml">
 
     
-    <title>网络库接口思索 - 徐锦平的博客</title>
-    <meta property='og:title' content="网络库接口思索 - 徐锦平的博客">
+    <title>redis 使用-hiredis库使用（一） 基本篇 看完本文就可以上手工作了 - 徐锦平的博客</title>
+    <meta property='og:title' content="redis 使用-hiredis库使用（一） 基本篇 看完本文就可以上手工作了 - 徐锦平的博客">
     <meta property="og:type" content="article">
     
 
-    <meta property="og:url" content="http://www.fpstop.com/think/net_interface/">
+    <meta property="og:url" content="http://www.fpstop.com/redis/hiredis1/">
     
     
 
@@ -90,11 +90,11 @@
       <article class="single" itemscope="itemscope" itemtype="http://schema.org/Article">
 
         <meta itemprop="mainEntityOfPage"  itemType="https://schema.org/WebPage" content="http://www.fpstop.com/"/>
-        <meta itemprop="dateModified" content="2017-03-19T19:40:51&#43;08:00">
-        <meta itemprop="headline" content="网络库接口思索">
-        <meta itemprop="description" content="自从linux出现了epoll，windows的完成端口，网络编程好多年没有什么变化了。本文结合工作中遇到的问题，说说网络库的接口的一些思索。
+        <meta itemprop="dateModified" content="2017-03-26T00:03:10&#43;08:00">
+        <meta itemprop="headline" content="redis 使用-hiredis库使用（一） 基本篇 看完本文就可以上手工作了">
+        <meta itemprop="description" content="hiredis 是redis的客户端sdk，可以让程序操作redis。本文先讲建立连接，基本的get/set命令，读写二进制，获取多个结果来讲。假设读者已经了解redis命令了。
 ">
-        <meta itemprop="url" content="http://www.fpstop.com/think/net_interface/">
+        <meta itemprop="url" content="http://www.fpstop.com/redis/hiredis1/">
         <div itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
           <meta itemprop="url" content="http://www.fpstop.com/images/default.jpg" />
           <meta itemprop="width" content="800">
@@ -113,38 +113,132 @@
         </div>
 
         <header class="article-header">
-          <time itemprop="datePublished" pubdate="pubdate" datetime="2017-03-19T19:40:51&#43;08:00">Sun, Mar 19, 2017</time>
-          <h1 class="article-title">网络库接口思索</h1>
+          <time itemprop="datePublished" pubdate="pubdate" datetime="2017-03-26T00:03:10&#43;08:00">Sun, Mar 26, 2017</time>
+          <h1 class="article-title">redis 使用-hiredis库使用（一） 基本篇 看完本文就可以上手工作了</h1>
         </header>
 
         <div class="article-body" itemprop="articleBody">
           
 
-<p>自从linux出现了epoll，windows的完成端口，网络编程好多年没有什么变化了。本文结合工作中遇到的问题，说说网络库的接口的一些思索。</p>
+<p>hiredis 是redis的客户端sdk，可以让程序操作redis。本文先讲建立连接，基本的get/set命令，读写二进制，获取多个结果来讲。假设读者已经了解redis命令了。</p>
 
-<h1 id="1-背景">1 背景</h1>
+<p>hiredis的代码也包含在redis代码中，redis\deps\hiredis目录下，接口很简单，几乎不用封装就可以用。</p>
 
-<p>因为做的是fps类的网游的服务器，游戏里跑，跳，开枪等都是由客户端引擎同步函数实现，没有我什么事，所以主要的逻辑都很简单，一些活动，商城购买，聊天等逻辑，可以说没有什么难点，因为项目的周期比较长，一共有三套网络库在使用。。。有封装boost的，还有老同事自己封装的两套。自从linux出现了epoll，windows的完成端口，网络编程好多年没有什么变化了。这里主要讨论的是异步的网络编程。</p>
+<h1 id="1-连接redis数据库">1 连接redis数据库</h1>
 
-<h1 id="2-我心目中的网络库的功能">2 我心目中的网络库的功能</h1>
+<h2 id="1-1-无超时时间-阻塞">1.1 无超时时间，阻塞</h2>
 
-<h2 id="2-1-通知上层网络事件-连接-断开-可读-可写">2.1 通知上层网络事件：连接，断开，可读，可写。</h2>
+<pre><code>redisContext *redisConnect(const char *ip, int port); 
+</code></pre>
 
-<p>基本的epoll已经实现了这些最基本的功能，简单的封装一下即可。
-库会告诉上层目前可读啦，可写啦，可以接收连接啦，已经连上啦，但是不会帮上层去做这些事情，只是告诉你可以做了。</p>
+<h2 id="1-2-设置超时时间-阻塞">1.2 设置超时时间，阻塞</h2>
 
-<h2 id="2-2-在2-1基础上-网络事件到来时-帮助我们做一些事情">2.2 在2.1基础上，网络事件到来时，帮助我们做一些事情</h2>
+<pre><code>redisContext *redisConnectWithTimeout(const char *ip, int port, const struct timeval tv);  
+</code></pre>
 
-<p>例如可读写时，自动从系统读缓冲区把数据读好，或者把用户写缓存写入系统的写缓冲区，或者调用accept接受一个连接。</p>
+<h2 id="1-3-非阻塞-立刻返回-也就无所谓超时">1.3 非阻塞，立刻返回，也就无所谓超时</h2>
 
-<h2 id="2-3-分包">2.3 分包</h2>
+<pre><code>redisContext *redisConnectNonBlock(const char *ip, int port);
+</code></pre>
 
-<p>我们知道在网络通信时,tcp是基于流的，分包只是我们逻辑上的把字节流分成若干部分。发送方发了两个包，有可能接收方1次收到了两个包，也有可能接收方分3次才把第一个包接受完，并接收了部分第2个包。一般我们都会在每个包的前两个字节里加上这个包的长度，这样接收方可以根据这个长度把收到的字节流区分成若干个包。
-而逻辑层使用时，不应该处理这些，应该等网络层判断收到一个完整的包以后，再通知逻辑层去处理。
-但是这样有个缺点，网络库就需要规定定义协议长度的规则，不过一般都是在包头加若干个字节定义长度。
-例如我们手游项目用的是protobuf协议，但是也需要在头部加两个字节代表长度。</p>
+<h1 id="2-执行命令">2 执行命令</h1>
 
-<p>未完待续。。</p>
+<pre><code>void *redisCommand(redisContext *c, const char *format, ...);
+</code></pre>
+
+<h2 id="2-1-返回值">2.1 返回值</h2>
+
+<p>返回值是redisReply类型的指针：</p>
+
+<pre><code>/* This is the reply object returned by redisCommand() */
+typedef struct redisReply {
+    int type; /* REDIS_REPLY_* */
+    PORT_LONGLONG integer; /* The integer when type is REDIS_REPLY_INTEGER */
+    int len; /* Length of string */
+    char *str; /* Used for both REDIS_REPLY_ERROR and REDIS_REPLY_STRING */
+    size_t elements; /* number of elements, for REDIS_REPLY_ARRAY */
+    struct redisReply **element; /* elements vector for REDIS_REPLY_ARRAY */
+} redisReply;
+</code></pre>
+
+<h2 id="2-2-返回值类型">2.2 返回值类型</h2>
+
+<p>type字段，包含以下几种类型：</p>
+
+<pre><code>#define REDIS_REPLY_STRING 1    //字符串
+#define REDIS_REPLY_ARRAY 2     //数组，例如mget返回值
+#define REDIS_REPLY_INTEGER 3   //数字类型
+#define REDIS_REPLY_NIL 4       //空
+#define REDIS_REPLY_STATUS 5    //状态，例如set成功返回的‘OK’
+#define REDIS_REPLY_ERROR 6     //执行失败
+</code></pre>
+
+<h1 id="3-基本命令-get-set">3 基本命令，get，set</h1>
+
+<h2 id="3-1-set">3.1 set</h2>
+
+<pre><code>redisReply *r1 = (redisReply*)redisCommand(c, &quot;set k v&quot;);
+</code></pre>
+
+<p>结果：
+    type = 5</p>
+
+<pre><code>len = 2
+
+str = OK
+</code></pre>
+
+<p>返回的类型5，是状态。str是OK，代表执行成功。</p>
+
+<h2 id="3-2-get">3.2 get</h2>
+
+<pre><code>redisReply *r2 = (redisReply*)redisCommand(c, &quot;get k&quot;);
+</code></pre>
+
+<p>结果：
+    type = 1</p>
+
+<pre><code>len = 1
+
+str = v
+</code></pre>
+
+<p>返回的类型是1，字符串类型，str是‘v’ ，刚才保存的。</p>
+
+<h1 id="4-存取二进制">4 存取二进制</h1>
+
+<pre><code>char sz[] = { 0,1,2,3,0 };
+redisReply *r3 = (redisReply*)redisCommand(c, &quot;set kb %b&quot;,sz,sizeof(sz));
+</code></pre>
+
+<p>存二进制的时候，使用%b，后面需要对应两个参数，指针和长度。</p>
+
+<pre><code>redisReply *r4 = (redisReply*)redisCommand(c, &quot;get kb&quot;);
+</code></pre>
+
+<p>读取二进制的时候，和普通是一样的，str字段是地址，len字段是长度。</p>
+
+<h1 id="5-存取多个值">5 存取多个值</h1>
+
+<h2 id="存多个值">存多个值</h2>
+
+<p>拼接字符串就好啦</p>
+
+<pre><code>redisReply *r5 = (redisReply*)redisCommand(c, &quot;mset k1 v1 k2 v2&quot;);
+</code></pre>
+
+<h2 id="取多个值">取多个值</h2>
+
+<pre><code>redisReply *r6 = (redisReply*)redisCommand(c, &quot;mget k1 k2&quot;);
+</code></pre>
+
+<p>这里主要看返回值里的这两个字段，代表返回值个数和起始地址：</p>
+
+<pre><code>size_t elements; /* number of elements, for REDIS_REPLY_ARRAY */
+struct redisReply **element; /* elements vector for REDIS_REPLY_ARRAY */
+</code></pre>
+
+<p>知道了以上知识，基本可以上手干活了，redis的接口还是很不错的，感觉都不用封装了。</p>
 
         </div>
 
