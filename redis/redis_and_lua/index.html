@@ -14,12 +14,12 @@
     <link rel="alternate" type="application/rss+xml" title="RSS" href="http://www.fpstop.com//index.xml">
 
     
-    <title>网络库接口思索 - 徐锦平的博客</title>
-    <meta property='og:title' content="网络库接口思索 - 徐锦平的博客">
+    <title>redis 使用lua脚本提高执行效率 - 徐锦平的博客</title>
+    <meta property='og:title' content="redis 使用lua脚本提高执行效率 - 徐锦平的博客">
     <meta property="og:type" content="article">
     
 
-    <meta property="og:url" content="http://www.fpstop.com/think/net_interface/">
+    <meta property="og:url" content="http://www.fpstop.com/redis/redis_and_lua/">
     
     
 
@@ -90,11 +90,11 @@
       <article class="single" itemscope="itemscope" itemtype="http://schema.org/Article">
 
         <meta itemprop="mainEntityOfPage"  itemType="https://schema.org/WebPage" content="http://www.fpstop.com/"/>
-        <meta itemprop="dateModified" content="2017-03-19T19:40:51&#43;08:00">
-        <meta itemprop="headline" content="网络库接口思索">
-        <meta itemprop="description" content="自从linux出现了epoll，windows的完成端口，网络编程好多年没有什么变化了。本文结合工作中遇到的问题，说说网络库的接口的一些思索。
+        <meta itemprop="dateModified" content="2017-05-21T23:59:24&#43;08:00">
+        <meta itemprop="headline" content="redis 使用lua脚本提高执行效率">
+        <meta itemprop="description" content="主要针对使用redis的同步api。
 ">
-        <meta itemprop="url" content="http://www.fpstop.com/think/net_interface/">
+        <meta itemprop="url" content="http://www.fpstop.com/redis/redis_and_lua/">
         <div itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
           <meta itemprop="url" content="http://www.fpstop.com/images/default.jpg" />
           <meta itemprop="width" content="800">
@@ -113,38 +113,45 @@
         </div>
 
         <header class="article-header">
-          <time itemprop="datePublished" pubdate="pubdate" datetime="2017-03-19T19:40:51&#43;08:00">Sun, Mar 19, 2017</time>
-          <h1 class="article-title">网络库接口思索</h1>
+          <time itemprop="datePublished" pubdate="pubdate" datetime="2017-05-21T23:59:24&#43;08:00">Sun, May 21, 2017</time>
+          <h1 class="article-title">redis 使用lua脚本提高执行效率</h1>
         </header>
 
         <div class="article-body" itemprop="articleBody">
           
 
-<p>自从linux出现了epoll，windows的完成端口，网络编程好多年没有什么变化了。本文结合工作中遇到的问题，说说网络库的接口的一些思索。</p>
+<p>主要针对使用redis的同步api。</p>
 
-<h1 id="1-背景">1 背景</h1>
+<h1 id="redis的同步api-代价非常昂贵">redis的同步api，代价非常昂贵</h1>
 
-<p>因为做的是fps类的网游的服务器，游戏里跑，跳，开枪等都是由客户端引擎同步函数实现，没有我什么事，所以主要的逻辑都很简单，一些活动，商城购买，聊天等逻辑，可以说没有什么难点，因为项目的周期比较长，一共有三套网络库在使用。。。有封装boost的，还有老同事自己封装的两套。自从linux出现了epoll，windows的完成端口，网络编程好多年没有什么变化了。这里主要讨论的是异步的网络编程。</p>
+<p>redis的同步api，每一次调用都是相当于一次网络通信，而且时阻塞的，如果赶上网络波动或者redis正在保存数据，会占用很多时间的。</p>
 
-<h1 id="2-我心目中的网络库的功能">2 我心目中的网络库的功能</h1>
+<pre><code>void *redisvCommand(redisContext *c, const char *format, va_list ap)
+{
+    send request...
+    recv result...
+    return ...;
+}
+</code></pre>
 
-<h2 id="2-1-通知上层网络事件-连接-断开-可读-可写">2.1 通知上层网络事件：连接，断开，可读，可写。</h2>
+<h1 id="2-适应情景分析">2 适应情景分析</h1>
 
-<p>基本的epoll已经实现了这些最基本的功能，简单的封装一下即可。
-库会告诉上层目前可读啦，可写啦，可以接收连接啦，已经连上啦，但是不会帮上层去做这些事情，只是告诉你可以做了。</p>
+<p>我们使用时，有很多类似下面的操作</p>
 
-<h2 id="2-2-在2-1基础上-网络事件到来时-帮助我们做一些事情">2.2 在2.1基础上，网络事件到来时，帮助我们做一些事情</h2>
+<pre><code>val1 = redis.command(&quot;get key1&quot;);
+if(val1 &gt; 10)
+    redis.command(&quot;set val1 100&quot;);
+else
+    redis.command(&quot;set val1 0&quot;);
+</code></pre>
 
-<p>例如可读写时，自动从系统读缓冲区把数据读好，或者把用户写缓存写入系统的写缓冲区，或者调用accept接受一个连接。</p>
+<p>简单地说，就是<strong>多次redis api调用，后面的操作以来于前面的执行结果</strong>。</p>
 
-<h2 id="2-3-分包">2.3 分包</h2>
+<h1 id="3-使用lua脚本优化">3 使用lua脚本优化</h1>
 
-<p>我们知道在网络通信时,tcp是基于流的，分包只是我们逻辑上的把字节流分成若干部分。发送方发了两个包，有可能接收方1次收到了两个包，也有可能接收方分3次才把第一个包接受完，并接收了部分第2个包。一般我们都会在每个包的前两个字节里加上这个包的长度，这样接收方可以根据这个长度把收到的字节流区分成若干个包。
-而逻辑层使用时，不应该处理这些，应该等网络层判断收到一个完整的包以后，再通知逻辑层去处理。
-但是这样有个缺点，网络库就需要规定定义协议长度的规则，不过一般都是在包头加若干个字节定义长度。
-例如我们手游项目用的是protobuf协议，但是也需要在头部加两个字节代表长度。</p>
+<p>redis server支持lua脚本，使用时相当于客户端把一小段lua脚本发到redis server执行，这个lua脚本可能会有多次操作。</p>
 
-<p>未完待续。。</p>
+<p>但是网络通信只有一次，redis server执行完lua脚本把结果返回给客户端，减少网络交互次数。</p>
 
         </div>
 

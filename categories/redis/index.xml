@@ -6,8 +6,51 @@
     <description>Recent content in Redis on 徐锦平的博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 26 Mar 2017 00:03:10 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 21 May 2017 23:59:24 +0800</lastBuildDate>
     <atom:link href="http://www.fpstop.com/categories/redis/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>redis 使用lua脚本提高执行效率</title>
+      <link>http://www.fpstop.com/redis/redis_and_lua/</link>
+      <pubDate>Sun, 21 May 2017 23:59:24 +0800</pubDate>
+      
+      <guid>http://www.fpstop.com/redis/redis_and_lua/</guid>
+      <description>
+
+&lt;p&gt;主要针对使用redis的同步api。&lt;/p&gt;
+
+&lt;h1 id=&#34;redis的同步api-代价非常昂贵&#34;&gt;redis的同步api，代价非常昂贵&lt;/h1&gt;
+
+&lt;p&gt;redis的同步api，每一次调用都是相当于一次网络通信，而且时阻塞的，如果赶上网络波动或者redis正在保存数据，会占用很多时间的。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;void *redisvCommand(redisContext *c, const char *format, va_list ap)
+{
+    send request...
+    recv result...
+    return ...;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&#34;2-适应情景分析&#34;&gt;2 适应情景分析&lt;/h1&gt;
+
+&lt;p&gt;我们使用时，有很多类似下面的操作&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;val1 = redis.command(&amp;quot;get key1&amp;quot;);
+if(val1 &amp;gt; 10)
+    redis.command(&amp;quot;set val1 100&amp;quot;);
+else
+    redis.command(&amp;quot;set val1 0&amp;quot;);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;简单地说，就是&lt;strong&gt;多次redis api调用，后面的操作以来于前面的执行结果&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;h1 id=&#34;3-使用lua脚本优化&#34;&gt;3 使用lua脚本优化&lt;/h1&gt;
+
+&lt;p&gt;redis server支持lua脚本，使用时相当于客户端把一小段lua脚本发到redis server执行，这个lua脚本可能会有多次操作。&lt;/p&gt;
+
+&lt;p&gt;但是网络通信只有一次，redis server执行完lua脚本把结果返回给客户端，减少网络交互次数。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>redis 使用-hiredis库使用（一） 基本篇 看完本文就可以上手工作了</title>
