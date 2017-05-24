@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>C&#43;&#43;11 on 徐锦平的博客</title>
+    <link>http://www.fpstop.com/categories/c&#43;&#43;11/</link>
+    <description>Recent content in C&#43;&#43;11 on 徐锦平的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 25 May 2017 06:17:57 +0800</lastBuildDate>
+    <atom:link href="http://www.fpstop.com/categories/c&#43;&#43;11/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>智能指针:指向基类的智能指针与指向子类的智能指针转换</title>
+      <link>http://www.fpstop.com/cpp/shared_ptr/</link>
+      <pubDate>Thu, 25 May 2017 06:17:57 +0800</pubDate>
+      
+      <guid>http://www.fpstop.com/cpp/shared_ptr/</guid>
+      <description>
+
+&lt;p&gt;以前没仔细想过这个问题，自己以前实现过的也不支持这个操作。昨天重读 &amp;lt;&lt;effective c++&gt;&amp;gt;，&lt;strong&gt;条款45时 运用成员函数模板，接受所有兼容类型&lt;/strong&gt;。发现了这个问题的实现方法。&lt;/p&gt;
+
+&lt;h1 id=&#34;声明基类和子类-a-b&#34;&gt;声明基类和子类，A，B&lt;/h1&gt;
+
+&lt;pre&gt;&lt;code&gt;class A
+{
+public:
+    A()
+    {
+        cout &amp;lt;&amp;lt; &amp;quot;new A&amp;quot;;
+    }
+    ~A()
+    {
+        cout &amp;lt;&amp;lt; &amp;quot;del A&amp;quot;;
+    }
+};
+
+class B :public A
+{
+public:
+    B()
+    {
+        cout &amp;lt;&amp;lt; &amp;quot;new B&amp;quot;;
+    }
+    ~B()
+    {
+        cout &amp;lt;&amp;lt; &amp;quot;del B&amp;quot;;
+    }
+};
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&#34;子类智能指针转基类智能指针&#34;&gt;子类智能指针转基类智能指针&lt;/h1&gt;
+
+&lt;p&gt;可以的，赋值操作也可以进行&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;std::shared_ptr&amp;lt;B&amp;gt; bbb(new B);
+std::shared_ptr&amp;lt;A&amp;gt; aaa(bbb);
+std::shared_ptr&amp;lt;A&amp;gt; aaa2 = bbb;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;拷贝构造时，会调用以下拷贝构造函数，is_convertible会检查是否可以转化（继承关系）。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;template&amp;lt;class _Ty2,
+class = typename enable_if&amp;lt;is_convertible&amp;lt;_Ty2 *, _Ty *&amp;gt;::value,
+    void&amp;gt;::type&amp;gt;
+shared_ptr(const shared_ptr&amp;lt;_Ty2&amp;gt;&amp;amp; _Other) _NOEXCEPT
+{   // construct shared_ptr object that owns same resource as _Other
+this-&amp;gt;_Reset(_Other);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;enable_if这个关键字我还不太会，不过看效果时编译期就可以检查出是否可以转换成功。基类转子类的智能指针时无法编译通过的：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;shared_ptr&amp;lt;A&amp;gt; aaa(new A);
+shared_ptr&amp;lt;B&amp;gt; bbb(aaa); // 无法转换
+
+ error C2664: &#39;std::shared_ptr&amp;lt;B&amp;gt;::shared_ptr(std::shared_ptr&amp;lt;B&amp;gt; &amp;amp;&amp;amp;) noexcept&#39;: cannot convert argument 1 from &#39;std::shared_ptr&amp;lt;A&amp;gt;&#39; to &#39;std::nullptr_t&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&#34;另一种转化方法-operator-t&#34;&gt;另一种转化方法：operator T*();&lt;/h1&gt;
+
+&lt;p&gt;游戏项目中是自己实现的智能指针，没有特殊为这种转换写构造函数，而是写了的转换，在上述调用时参数自动转换成T*。
+&lt;strong&gt;不过这种实现方法要求引用计数保存在对象中，而不是智能指针&lt;/strong&gt;，因为无法对隐世转换的智能指针增加计数。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

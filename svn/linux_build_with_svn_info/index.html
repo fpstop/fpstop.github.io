@@ -134,8 +134,8 @@ rm -rf DST
 echo '#ifndef _SVN_INFO_' &gt; $DST
 echo '#define _SVN_INFO_' &gt;&gt; $DST
 
-**VERSION=`svn info|grep Revision`**
-**echo '  #define SVNINFO &quot;'$VERSION' '$1'&quot; ' &gt;&gt; $DST**
+VERSION=`svn info|grep Revision`
+echo '  #define SVNINFO &quot;'$VERSION' '$1'&quot; ' &gt;&gt; $DST
 
 echo '#endif' &gt;&gt; $DST
 #  
@@ -178,6 +178,8 @@ echo $VERSION
       
       <a href="http://www.fpstop.com/categories/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B" class="list-group-item">网络编程</a>
       
+      <a href="http://www.fpstop.com/categories/c&#43;&#43;11" class="list-group-item">c&#43;&#43;11</a>
+      
       <a href="http://www.fpstop.com/categories/protobuf" class="list-group-item">protobuf</a>
       
       <a href="http://www.fpstop.com/categories/%E6%80%9D%E8%80%83" class="list-group-item">思考</a>
@@ -202,6 +204,8 @@ echo $VERSION
       <h2 class="panel-title">最近更新</h2>
     </div>
     <div class="list-group">
+      
+      <a href="http://www.fpstop.com/cpp/shared_ptr/" class="list-group-item">智能指针:指向基类的智能指针与指向子类的智能指针转换</a>
       
       <a href="http://www.fpstop.com/svn/linux_build_with_svn_info/" class="list-group-item">linux编译版本时日志中打印svn版本号</a>
       

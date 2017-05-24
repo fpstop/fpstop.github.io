@@ -31,8 +31,8 @@ rm -rf DST
 echo &#39;#ifndef _SVN_INFO_&#39; &amp;gt; $DST
 echo &#39;#define _SVN_INFO_&#39; &amp;gt;&amp;gt; $DST
 
-**VERSION=`svn info|grep Revision`**
-**echo &#39;  #define SVNINFO &amp;quot;&#39;$VERSION&#39; &#39;$1&#39;&amp;quot; &#39; &amp;gt;&amp;gt; $DST**
+VERSION=`svn info|grep Revision`
+echo &#39;  #define SVNINFO &amp;quot;&#39;$VERSION&#39; &#39;$1&#39;&amp;quot; &#39; &amp;gt;&amp;gt; $DST
 
 echo &#39;#endif&#39; &amp;gt;&amp;gt; $DST
 #  

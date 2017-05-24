@@ -14,12 +14,12 @@
     <link rel="alternate" type="application/rss+xml" title="RSS" href="http://www.fpstop.com//index.xml">
 
     
-    <title>socket的属性设置 （持续更新） - 徐锦平的博客</title>
-    <meta property='og:title' content="socket的属性设置 （持续更新） - 徐锦平的博客">
+    <title>智能指针:指向基类的智能指针与指向子类的智能指针转换 - 徐锦平的博客</title>
+    <meta property='og:title' content="智能指针:指向基类的智能指针与指向子类的智能指针转换 - 徐锦平的博客">
     <meta property="og:type" content="article">
     
 
-    <meta property="og:url" content="http://www.fpstop.com/redis/learn_src1/">
+    <meta property="og:url" content="http://www.fpstop.com/cpp/shared_ptr/">
     
     
 
@@ -90,15 +90,11 @@
       <article class="single" itemscope="itemscope" itemtype="http://schema.org/Article">
 
         <meta itemprop="mainEntityOfPage"  itemType="https://schema.org/WebPage" content="http://www.fpstop.com/"/>
-        <meta itemprop="dateModified" content="2017-03-24T21:47:04&#43;08:00">
-        <meta itemprop="headline" content="socket的属性设置 （持续更新）">
-        <meta itemprop="description" content="今天看redis代码时，发现了如下代码，设置阻塞socket的读写超时时间，仔细一看就是简单的设置了一下socket的属性，索性把socket一些属性总结一下。
-
-/* Set read/write timeout on a blocking socket. */
-int redisSetTimeout(redisContext *c, const struct timeval tv)
-
+        <meta itemprop="dateModified" content="2017-05-25T06:17:57&#43;08:00">
+        <meta itemprop="headline" content="智能指针:指向基类的智能指针与指向子类的智能指针转换">
+        <meta itemprop="description" content="以前没仔细想过这个问题，自己以前实现过的也不支持这个操作。昨天重读 &lt;&gt;，条款45时 运用成员函数模板，接受所有兼容类型。发现了这个问题的实现方法。
 ">
-        <meta itemprop="url" content="http://www.fpstop.com/redis/learn_src1/">
+        <meta itemprop="url" content="http://www.fpstop.com/cpp/shared_ptr/">
         <div itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
           <meta itemprop="url" content="http://www.fpstop.com/images/default.jpg" />
           <meta itemprop="width" content="800">
@@ -117,150 +113,76 @@ int redisSetTimeout(redisContext *c, const struct timeval tv)
         </div>
 
         <header class="article-header">
-          <time itemprop="datePublished" pubdate="pubdate" datetime="2017-03-24T21:47:04&#43;08:00">Fri, Mar 24, 2017</time>
-          <h1 class="article-title">socket的属性设置 （持续更新）</h1>
+          <time itemprop="datePublished" pubdate="pubdate" datetime="2017-05-25T06:17:57&#43;08:00">Thu, May 25, 2017</time>
+          <h1 class="article-title">智能指针:指向基类的智能指针与指向子类的智能指针转换</h1>
         </header>
 
         <div class="article-body" itemprop="articleBody">
           
 
-<p>今天看redis代码时，发现了如下代码，设置阻塞socket的读写超时时间，仔细一看就是简单的设置了一下socket的属性，索性把socket一些属性总结一下。</p>
+<p>以前没仔细想过这个问题，自己以前实现过的也不支持这个操作。昨天重读 &lt;<effective c++>&gt;，<strong>条款45时 运用成员函数模板，接受所有兼容类型</strong>。发现了这个问题的实现方法。</p>
 
-<pre><code>/* Set read/write timeout on a blocking socket. */
-int redisSetTimeout(redisContext *c, const struct timeval tv)
-</code></pre>
+<h1 id="声明基类和子类-a-b">声明基类和子类，A，B</h1>
 
-<h2 id="1-读超时">1 读超时</h2>
-
-<blockquote>
-<p>The timeout, in milliseconds, for blocking receive calls. The default for this option is zero, which indicates that a receive operation will not time out. If a blocking receive call times out, the connection is in an indeterminate state and should be closed.
-    注意，linux和windows的参数略不同。</p>
-</blockquote>
-
-<pre><code>    bool SetRecvTimeOut(uint32 millisecond)
-    {
-#ifdef WIN32
-        DWORD time = millisecond;
-        if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (const char*)&amp;time, sizeof(DWORD)) == -1) {
-            return false;
-        }
-#else
-        struct timeval tv;
-        tv.tv_sec = millisecond / 1000;
-        tv.tv_usec = (millisecond % 1000) * 1000;
-        if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (const char*)&amp;tv, sizeof(tv)) == -1) {
-            return false;
-        }
-#endif
-        return true;
-    }
-</code></pre>
-
-<h2 id="2-写超时">2 写超时</h2>
-
-<blockquote>
-<p>The timeout, in milliseconds, for blocking send calls. The default for this option is zero, which indicates that a send operation will not time out. If a blocking send call times out, the connection is in an indeterminate state and should be closed.</p>
-</blockquote>
-
-<pre><code>注意，linux和windows的参数略不同。
-
-    bool SetSendTimeOut(uint32 millisecond)
-    {
-#ifdef WIN32
-        DWORD time = millisecond;
-        if (setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (const char*)&amp;time, sizeof(DWORD)) == -1) {
-            return false;
-        }
-#else
-        struct timeval tv;
-        tv.tv_sec = millisecond / 1000;
-        tv.tv_usec = (millisecond % 1000) * 1000;
-        if (setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (const char*)&amp;tv, sizeof(tv)) == -1) {
-            return false;
-        }
-#endif
-        return true;
-    }
-</code></pre>
-
-<h2 id="3-地址重用">3 地址重用</h2>
-
-<blockquote>
-<p>Allows a socket to bind to an address and port already in use. The SO_EXCLUSIVEADDRUSE option can prevent this.</p>
-</blockquote>
-
-<p>一个端口释放后会等待两分钟之后才能再被使用，SO_REUSEADDR是让端口释放后立即就可以被再次使用。</p>
-
-<p>p2p打洞时也需要设置这个属性。</p>
-
-<p>公司的网络库貌似都会设置这个属性呢。</p>
-
-<pre><code>bool SetReUseAddr(int v)
+<pre><code>class A
 {
-    int ret = setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (const char*)&amp;v, sizeof(v));
-    return 0 == ret;
+public:
+    A()
+    {
+        cout &lt;&lt; &quot;new A&quot;;
+    }
+    ~A()
+    {
+        cout &lt;&lt; &quot;del A&quot;;
+    }
+};
+
+class B :public A
+{
+public:
+    B()
+    {
+        cout &lt;&lt; &quot;new B&quot;;
+    }
+    ~B()
+    {
+        cout &lt;&lt; &quot;del B&quot;;
+    }
+};
+</code></pre>
+
+<h1 id="子类智能指针转基类智能指针">子类智能指针转基类智能指针</h1>
+
+<p>可以的，赋值操作也可以进行</p>
+
+<pre><code>std::shared_ptr&lt;B&gt; bbb(new B);
+std::shared_ptr&lt;A&gt; aaa(bbb);
+std::shared_ptr&lt;A&gt; aaa2 = bbb;
+</code></pre>
+
+<p>拷贝构造时，会调用以下拷贝构造函数，is_convertible会检查是否可以转化（继承关系）。</p>
+
+<pre><code>template&lt;class _Ty2,
+class = typename enable_if&lt;is_convertible&lt;_Ty2 *, _Ty *&gt;::value,
+    void&gt;::type&gt;
+shared_ptr(const shared_ptr&lt;_Ty2&gt;&amp; _Other) _NOEXCEPT
+{   // construct shared_ptr object that owns same resource as _Other
+this-&gt;_Reset(_Other);
 }
 </code></pre>
 
-<h2 id="4-keepalive">4 keepalive</h2>
+<p>enable_if这个关键字我还不太会，不过看效果时编译期就可以检查出是否可以转换成功。基类转子类的智能指针时无法编译通过的：</p>
 
-<p>设置心跳包，还可以指定心跳包频率，不过建议还是在逻辑层设计心跳协议，来检查连接存活。</p>
+<pre><code>shared_ptr&lt;A&gt; aaa(new A);
+shared_ptr&lt;B&gt; bbb(aaa); // 无法转换
 
-<pre><code>int val = 1;
-setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &amp;val, sizeof(val))
+ error C2664: 'std::shared_ptr&lt;B&gt;::shared_ptr(std::shared_ptr&lt;B&gt; &amp;&amp;) noexcept': cannot convert argument 1 from 'std::shared_ptr&lt;A&gt;' to 'std::nullptr_t'
 </code></pre>
 
-<h2 id="5-tcp-nodelay">5 TCP_NODELAY</h2>
+<h1 id="另一种转化方法-operator-t">另一种转化方法：operator T*();</h1>
 
-<p>TCP_NODELAY和TCP_CORK基本上控制了包的“Nagle化”，这里我们主要讲TCP_NODELAY.Nagle化在这里的含义是采用Nagle算法把较小的包组装为更大的帧。JohnNagle是Nagle算法的发明人，后者就是用他的名字来命名的，他在1984年首次用这种方法来尝试解决福特汽车公司的网络拥塞问题（欲了解详情请参看IETF RFC 896）。他解决的问题就是所谓的silly window syndrome，中文称“愚蠢窗口症候群”，具体含义是，因为普遍终端应用程序每产生一次击键操作就会发送一个包，而典型情况下一个包会拥有一个字节的数据载荷以及40个字节长的包头，于是产生4000%的过载，很轻易地就能令网络发生拥塞,。Nagle化后来成了一种标准并且立即在因特网上得以实现。它现在已经成为缺省配置了，但在我们看来，有些场合下把这一选项关掉也是合乎需要的。</p>
-
-<p>现在让我们假设某个应用程序发出了一个请求，希望发送小块数据，比如sns游戏中的点击确定按钮。我们可以选择立即发送数据或者等待产生更多的数据然后再一次发送两种策略。如果我们马上发送数据，那么交互性的以及客户/服务器型的应用程序将极大地受益。例如，当我们正在发送一个较短的请求并且等候较大的响应时，相关过载与传输的数据总量相比就会比较低，而且，如果请求立即发出那么响应时间也会快一些。以上操作可以通过设置套接字的TCP_NODELAY选项来完成，这样就禁用了Nagle算法，在nginx中设置tcp_nodelay on,注意放在http标签里。</p>
-
-<p><strong>总之这种把小包组成大包的操作应该由逻辑层来做</strong></p>
-
-<pre><code>bool SetNoDelay()
-{
-    int yes = 1;
-
-    if (setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, &amp;yes, sizeof(yes)) == -1) {
-        return false;
-    }
-    return true;
-}
-</code></pre>
-
-<h2 id="6-阻塞非阻塞">6 阻塞非阻塞</h2>
-
-<p>这个属性应该是最重要最常用的了。</p>
-
-<pre><code>    //1 :non block
-    int SetNonBlock(int value)
-    {
-#ifndef WIN32
-        int oldflags = ::fcntl(sock, F_GETFL, 0);
-        /* If reading the flags failed, return error indication now. */
-        if (oldflags == -1)
-            return -1;
-
-        /* Set just the flag we want to set. */
-        if (value != 0)
-            oldflags |= O_NONBLOCK;
-        else
-            oldflags &amp;= ~O_NONBLOCK;
-        /* Store modified flag word in the descriptor. */
-        return ::fcntl(m_iSock, F_SETFL, oldflags);
-#else
-        if (::ioctlsocket(sock, FIONBIO, (u_long FAR*)&amp;value) == SOCKET_ERROR)
-        {
-            return -1;
-        }
-
-        return 0;
-#endif
-    }
-</code></pre>
-
-<p>上文中的例子<a href="https://github.com/xjp342023125/Code/blob/master/common/XSock.hpp">XSock.hpp</a></p>
+<p>游戏项目中是自己实现的智能指针，没有特殊为这种转换写构造函数，而是写了的转换，在上述调用时参数自动转换成T*。
+<strong>不过这种实现方法要求引用计数保存在对象中，而不是智能指针</strong>，因为无法对隐世转换的智能指针增加计数。</p>
 
         </div>
 
