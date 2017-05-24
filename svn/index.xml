@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Svns on 徐锦平的博客</title>
+    <link>http://www.fpstop.com/svn/</link>
+    <description>Recent content in Svns on 徐锦平的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 25 May 2017 05:54:05 +0800</lastBuildDate>
+    <atom:link href="http://www.fpstop.com/svn/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>linux编译版本时日志中打印svn版本号</title>
+      <link>http://www.fpstop.com/svn/linux_build_with_svn_info/</link>
+      <pubDate>Thu, 25 May 2017 05:54:05 +0800</pubDate>
+      
+      <guid>http://www.fpstop.com/svn/linux_build_with_svn_info/</guid>
+      <description>&lt;p&gt;做游戏开发，有很多时候查bug，最后都是发现时因为测试没有替补丁。所以想，如果日志里能把svn当前的版本号打印出来多好，先排除版本问题。&lt;/p&gt;
+
+&lt;p&gt;从svn中提取信息貌似很不容易，后来想到一种取巧的方法：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;编译脚本中，调用 svn info命令，把svn输出的一个文件，命名为 svn_info.h。&lt;/li&gt;
+&lt;li&gt;代码包含 svn_info.h,日志中输出svn版本号。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;脚本提取时，用grep过滤一下信息：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;DST=./Common/svn_info.h
+rm -rf DST
+echo &#39;#ifndef _SVN_INFO_&#39; &amp;gt; $DST
+echo &#39;#define _SVN_INFO_&#39; &amp;gt;&amp;gt; $DST
+
+**VERSION=`svn info|grep Revision`**
+**echo &#39;  #define SVNINFO &amp;quot;&#39;$VERSION&#39; &#39;$1&#39;&amp;quot; &#39; &amp;gt;&amp;gt; $DST**
+
+echo &#39;#endif&#39; &amp;gt;&amp;gt; $DST
+#  
+echo $VERSION
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后就会生成类似如下的文件：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#ifndef _SVN_INFO_
+#define _SVN_INFO_
+#define SVNINFO  &amp;quot;Revision: 11111&amp;quot;
+#endif
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;很简单吧。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

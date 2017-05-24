@@ -14,12 +14,12 @@
     <link rel="alternate" type="application/rss+xml" title="RSS" href="http://www.fpstop.com//index.xml">
 
     
-    <title>Redis - 徐锦平的博客</title>
-    <meta property='og:title' content="Redis - 徐锦平的博客">
+    <title>linux编译版本时日志中打印svn版本号 - 徐锦平的博客</title>
+    <meta property='og:title' content="linux编译版本时日志中打印svn版本号 - 徐锦平的博客">
     <meta property="og:type" content="article">
     
 
-    <meta property="og:url" content="http://www.fpstop.com/categories/redis/">
+    <meta property="og:url" content="http://www.fpstop.com/svn/linux_build_with_svn_info/">
     
     
 
@@ -81,66 +81,87 @@
       <div class="container">
 
 
-<div class="list">
+
+<div class="single">
 
   <div class="row">
     <div class="col-md-8">
-      <header class="page-title">Redis</header>
 
-      
-      <article class="li">
-  <header>
-    <div class="date">Sun, May 21, 2017</div>
-    <div class="title"><a href="http://www.fpstop.com/redis/redis_and_lua/">redis 使用lua脚本提高执行效率</a></div>
-  </header>
-  <div class="body"><p>主要针对使用redis的同步api。</p>
-</div>
+      <article class="single" itemscope="itemscope" itemtype="http://schema.org/Article">
 
-  
-  <footer>
-    <a href="http://www.fpstop.com/redis/redis_and_lua/" class="btn btn-default">Read More…</a>
-  </footer>
-  
-</article>
-<hr>
+        <meta itemprop="mainEntityOfPage"  itemType="https://schema.org/WebPage" content="http://www.fpstop.com/"/>
+        <meta itemprop="dateModified" content="2017-05-25T05:54:05&#43;08:00">
+        <meta itemprop="headline" content="linux编译版本时日志中打印svn版本号">
+        <meta itemprop="description" content="做游戏开发，有很多时候查bug，最后都是发现时因为测试没有替补丁。所以想，如果日志里能把svn当前的版本号打印出来多好，先排除版本问题。
+">
+        <meta itemprop="url" content="http://www.fpstop.com/svn/linux_build_with_svn_info/">
+        <div itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
+          <meta itemprop="url" content="http://www.fpstop.com/images/default.jpg" />
+          <meta itemprop="width" content="800">
+          <meta itemprop="height" content="800">
+        </div>
+        <div itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+          <div itemprop="logo" itemscope itemtype="https://schema.org/ImageObject">
+            <meta itemprop="url" content="http://www.fpstop.com/images/logo.jpg">
+            <meta itemprop="width" content="100">
+            <meta itemprop="height" content="100">
+          </div>
+          <meta itemprop="name" content="徐锦平的博客">
+        </div>
+        <div itemprop="author" itemscope itemtype="https://schema.org/Person">
+          <meta itemprop="name" content="">
+        </div>
 
-      
-      <article class="li">
-  <header>
-    <div class="date">Sun, Mar 26, 2017</div>
-    <div class="title"><a href="http://www.fpstop.com/redis/hiredis1/">redis 使用-hiredis库使用（一） 基本篇 看完本文就可以上手工作了</a></div>
-  </header>
-  <div class="body"><p>hiredis 是redis的客户端sdk，可以让程序操作redis。本文先讲建立连接，基本的get/set命令，读写二进制，获取多个结果来讲。假设读者已经了解redis命令了。</p>
-</div>
+        <header class="article-header">
+          <time itemprop="datePublished" pubdate="pubdate" datetime="2017-05-25T05:54:05&#43;08:00">Thu, May 25, 2017</time>
+          <h1 class="article-title">linux编译版本时日志中打印svn版本号</h1>
+        </header>
 
-  
-  <footer>
-    <a href="http://www.fpstop.com/redis/hiredis1/" class="btn btn-default">Read More…</a>
-  </footer>
-  
-</article>
-<hr>
+        <div class="article-body" itemprop="articleBody">
+          <p>做游戏开发，有很多时候查bug，最后都是发现时因为测试没有替补丁。所以想，如果日志里能把svn当前的版本号打印出来多好，先排除版本问题。</p>
 
-      
-      <article class="li">
-  <header>
-    <div class="date">Sun, Mar 12, 2017</div>
-    <div class="title"><a href="http://www.fpstop.com/redis/windows%E7%BC%96%E8%AF%91redis/">windows编译redis</a></div>
-  </header>
-  <div class="body"><p>假设大家都已经了解redis了，本文只讲redis的windows上的编译。</p>
-</div>
+<p>从svn中提取信息貌似很不容易，后来想到一种取巧的方法：</p>
 
-  
-  <footer>
-    <a href="http://www.fpstop.com/redis/windows%E7%BC%96%E8%AF%91redis/" class="btn btn-default">Read More…</a>
-  </footer>
-  
-</article>
-<hr>
+<ul>
+<li>编译脚本中，调用 svn info命令，把svn输出的一个文件，命名为 svn_info.h。</li>
+<li>代码包含 svn_info.h,日志中输出svn版本号。</li>
+</ul>
 
-      
-      
+<p>脚本提取时，用grep过滤一下信息：</p>
 
+<pre><code>DST=./Common/svn_info.h
+rm -rf DST
+echo '#ifndef _SVN_INFO_' &gt; $DST
+echo '#define _SVN_INFO_' &gt;&gt; $DST
+
+**VERSION=`svn info|grep Revision`**
+**echo '  #define SVNINFO &quot;'$VERSION' '$1'&quot; ' &gt;&gt; $DST**
+
+echo '#endif' &gt;&gt; $DST
+#  
+echo $VERSION
+</code></pre>
+
+<p>然后就会生成类似如下的文件：</p>
+
+<pre><code>#ifndef _SVN_INFO_
+#define _SVN_INFO_
+#define SVNINFO  &quot;Revision: 11111&quot;
+#endif
+</code></pre>
+
+<p>很简单吧。</p>
+
+        </div>
+
+
+        <aside>
+          
+          
+          
+        </aside>
+
+      </article>
 
     </div>
     <div class="col-md-4">
@@ -212,6 +233,7 @@
   </div>
 
 </div>
+
       </div>
     </div>
 
