@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Linux on 徐锦平的博客</title>
+    <link>http://www.fpstop.com/categories/linux/</link>
+    <description>Recent content in Linux on 徐锦平的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 25 May 2017 23:11:46 +0800</lastBuildDate>
+    <atom:link href="http://www.fpstop.com/categories/linux/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>日不落的服务器-linux下利用信号捕获崩溃</title>
+      <link>http://www.fpstop.com/linux/signal/</link>
+      <pubDate>Thu, 25 May 2017 23:11:46 +0800</pubDate>
+      
+      <guid>http://www.fpstop.com/linux/signal/</guid>
+      <description>
+
+&lt;p&gt;windows系统下的异常处理是&lt;strong&gt;try，&lt;/strong&gt;except,linux下可以用信号来模拟捕捉异常，其实我感觉还是windows下的比较好用。&lt;/p&gt;
+
+&lt;p&gt;分两步，设置信号处理函数，设置一个还原点。&lt;/p&gt;
+
+&lt;h1 id=&#34;设置信号处理函数&#34;&gt;设置信号处理函数&lt;/h1&gt;
+
+&lt;p&gt;一般崩溃时都是收到这两个信号。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;::signal(SIGSEGV, KFXDoSigSEGV);
+::signal(SIGFPE, KFXDoSigSEGV);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&#34;设置还原点-一般都是在主循环上面设置&#34;&gt;设置还原点，一般都是在主循环上面设置&lt;/h1&gt;
+
+&lt;pre&gt;&lt;code&gt;sigjmp_buf context;//全局对象
+.... 
+sigsetjmp(gDoSEGV.context,1);//主循环上方
+
+while(1)
+{
+    main_loop();
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&#34;发生异常时&#34;&gt;发生异常时&lt;/h1&gt;
+
+&lt;pre&gt;&lt;code&gt;会调用我们设置的信号处理函数，然后会执行siglongjmp，跳转到我们设置的还原点，重新进入主循环。
+
+static void KFXDoSigSEGV(int nSig)
+{
+    // 打印一些崩溃信息
+    siglongjmp(context, 1);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&#34;思考&#34;&gt;思考&lt;/h1&gt;
+
+&lt;p&gt;不能完全依赖这种方法避免服务器崩溃， 不然会掩盖错误。现在的做法时捕捉到崩溃的时候，打印调用堆栈，然后通知研发计数+1，如果连续捕获到1000次崩溃，就走默认处理真正崩溃，每次捕获后立刻通知研发人员查代码。&lt;/p&gt;
+
+&lt;p&gt;如果是低概率的崩溃事件，可以不影响游戏的其他玩家。&lt;/p&gt;
+
+&lt;p&gt;如果是极高概率出现，1000次以后也会真正的崩溃。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

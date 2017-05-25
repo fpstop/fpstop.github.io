@@ -14,12 +14,12 @@
     <link rel="alternate" type="application/rss+xml" title="RSS" href="http://www.fpstop.com//index.xml">
 
     
-    <title>Protobuf - 徐锦平的博客</title>
-    <meta property='og:title' content="Protobuf - 徐锦平的博客">
+    <title>日不落的服务器-linux下利用信号捕获崩溃 - 徐锦平的博客</title>
+    <meta property='og:title' content="日不落的服务器-linux下利用信号捕获崩溃 - 徐锦平的博客">
     <meta property="og:type" content="article">
     
 
-    <meta property="og:url" content="http://www.fpstop.com/categories/protobuf/">
+    <meta property="og:url" content="http://www.fpstop.com/linux/signal/">
     
     
 
@@ -81,32 +81,98 @@
       <div class="container">
 
 
-<div class="list">
+
+<div class="single">
 
   <div class="row">
     <div class="col-md-8">
-      <header class="page-title">Protobuf</header>
 
-      
-      <article class="li">
-  <header>
-    <div class="date">Mon, May 22, 2017</div>
-    <div class="title"><a href="http://www.fpstop.com/third/protobuf_string/">protobuf的DebugString方法，汉字乱码</a></div>
-  </header>
-  <div class="body"><p>本文不是解决乱码问题，是要提取乱码内容。游戏上线后要做舆情分析，想收集前两日玩家游戏内聊天内容，无奈没有专门的日志，只能从网络库日志提取protobuf的内容。</p>
-</div>
+      <article class="single" itemscope="itemscope" itemtype="http://schema.org/Article">
 
-  
-  <footer>
-    <a href="http://www.fpstop.com/third/protobuf_string/" class="btn btn-default">Read More…</a>
-  </footer>
-  
-</article>
-<hr>
+        <meta itemprop="mainEntityOfPage"  itemType="https://schema.org/WebPage" content="http://www.fpstop.com/"/>
+        <meta itemprop="dateModified" content="2017-05-25T23:11:46&#43;08:00">
+        <meta itemprop="headline" content="日不落的服务器-linux下利用信号捕获崩溃">
+        <meta itemprop="description" content="windows系统下的异常处理是try，except,linux下可以用信号来模拟捕捉异常，其实我感觉还是windows下的比较好用。
+">
+        <meta itemprop="url" content="http://www.fpstop.com/linux/signal/">
+        <div itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
+          <meta itemprop="url" content="http://www.fpstop.com/images/default.jpg" />
+          <meta itemprop="width" content="800">
+          <meta itemprop="height" content="800">
+        </div>
+        <div itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+          <div itemprop="logo" itemscope itemtype="https://schema.org/ImageObject">
+            <meta itemprop="url" content="http://www.fpstop.com/images/logo.jpg">
+            <meta itemprop="width" content="100">
+            <meta itemprop="height" content="100">
+          </div>
+          <meta itemprop="name" content="徐锦平的博客">
+        </div>
+        <div itemprop="author" itemscope itemtype="https://schema.org/Person">
+          <meta itemprop="name" content="">
+        </div>
 
-      
-      
+        <header class="article-header">
+          <time itemprop="datePublished" pubdate="pubdate" datetime="2017-05-25T23:11:46&#43;08:00">Thu, May 25, 2017</time>
+          <h1 class="article-title">日不落的服务器-linux下利用信号捕获崩溃</h1>
+        </header>
 
+        <div class="article-body" itemprop="articleBody">
+          
+
+<p>windows系统下的异常处理是<strong>try，</strong>except,linux下可以用信号来模拟捕捉异常，其实我感觉还是windows下的比较好用。</p>
+
+<p>分两步，设置信号处理函数，设置一个还原点。</p>
+
+<h1 id="设置信号处理函数">设置信号处理函数</h1>
+
+<p>一般崩溃时都是收到这两个信号。</p>
+
+<pre><code>::signal(SIGSEGV, KFXDoSigSEGV);
+::signal(SIGFPE, KFXDoSigSEGV);
+</code></pre>
+
+<h1 id="设置还原点-一般都是在主循环上面设置">设置还原点，一般都是在主循环上面设置</h1>
+
+<pre><code>sigjmp_buf context;//全局对象
+.... 
+sigsetjmp(gDoSEGV.context,1);//主循环上方
+
+while(1)
+{
+    main_loop();
+}
+</code></pre>
+
+<h1 id="发生异常时">发生异常时</h1>
+
+<pre><code>会调用我们设置的信号处理函数，然后会执行siglongjmp，跳转到我们设置的还原点，重新进入主循环。
+
+static void KFXDoSigSEGV(int nSig)
+{
+    // 打印一些崩溃信息
+    siglongjmp(context, 1);
+}
+</code></pre>
+
+<h1 id="思考">思考</h1>
+
+<p>不能完全依赖这种方法避免服务器崩溃， 不然会掩盖错误。现在的做法时捕捉到崩溃的时候，打印调用堆栈，然后通知研发计数+1，如果连续捕获到1000次崩溃，就走默认处理真正崩溃，每次捕获后立刻通知研发人员查代码。</p>
+
+<p>如果是低概率的崩溃事件，可以不影响游戏的其他玩家。</p>
+
+<p>如果是极高概率出现，1000次以后也会真正的崩溃。</p>
+
+        </div>
+
+
+        <aside>
+          
+          
+          
+        </aside>
+
+      </article>
 
     </div>
     <div class="col-md-4">
@@ -184,6 +250,7 @@
   </div>
 
 </div>
+
       </div>
     </div>
 
