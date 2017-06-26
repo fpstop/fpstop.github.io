@@ -6,8 +6,120 @@
     <description>Recent content on 徐锦平的博客</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 20 Jun 2017 05:55:59 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 21 Jun 2017 06:29:50 +0800</lastBuildDate>
     <atom:link href="http://www.fpstop.com/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>c&#43;&#43;11 右值引用</title>
+      <link>http://www.fpstop.com/cpp/right_ref/</link>
+      <pubDate>Wed, 21 Jun 2017 06:29:50 +0800</pubDate>
+      
+      <guid>http://www.fpstop.com/cpp/right_ref/</guid>
+      <description>
+
+&lt;p&gt;一直以来以为右值引用的误区终于搞懂了。&lt;/p&gt;
+
+&lt;h1 id=&#34;误区&#34;&gt;误区&lt;/h1&gt;
+
+&lt;h2 id=&#34;误区一-右值引用是编译期通过指针实现的&#34;&gt;误区一：右值引用是编译期通过指针实现的&lt;/h2&gt;
+
+&lt;p&gt;原来以为右值引用是编译期给你完成的，自己不需要做任何事情，就可以实现高效，以为编译期是内部通过指针来实现的。&lt;/p&gt;
+
+&lt;p&gt;右值引用好用，需要自己写&lt;strong&gt;右值引用构造&lt;/strong&gt;和&lt;strong&gt;右值引用拷贝&lt;/strong&gt;，当符合右值转移的条件时，会自动调用下面这两个函数，如果你不写的话，还是会调用拷贝构造函数。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;pre&gt;&lt;code&gt;A&amp;amp; operator=(const A&amp;amp;&amp;amp; r)
+A(const A&amp;amp;&amp;amp; r)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;当然stl里面的类都已经写好右值引用构造和右值引用拷贝。&lt;/p&gt;
+
+&lt;h2 id=&#34;右值引用后-右值不再析构&#34;&gt;右值引用后，右值不再析构&lt;/h2&gt;
+
+&lt;p&gt;这个误区产生的原因和上面类似，其实右值还是一个对象，还会正常析构，只不过析构时不再回收资源，资源已经被挪走。&lt;/p&gt;
+
+&lt;h1 id=&#34;右值引用的机制&#34;&gt;右值引用的机制&lt;/h1&gt;
+
+&lt;p&gt;右值引用调用的时机如下：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;参数为右值时。&lt;/li&gt;
+&lt;li&gt;参数为左值，但是通过std::move转化为右值时。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;c++11 加入右值引用特性，是给你个机会，当以上两种情况满足其一时，可以调用你写的右值函数，如果你不写，就会调用普通的拷贝构造函数和赋值函数。&lt;/p&gt;
+
+&lt;h1 id=&#34;实验的小例子&#34;&gt;实验的小例子&lt;/h1&gt;
+
+&lt;pre&gt;&lt;code&gt;class A
+{
+public:
+    A()
+    {
+        cout &amp;lt;&amp;lt; &amp;quot;new A&amp;quot; &amp;lt;&amp;lt; endl;
+    }
+    ~A()
+    {
+        cout &amp;lt;&amp;lt; &amp;quot;del A&amp;quot; &amp;lt;&amp;lt; endl;
+    }
+
+    A(const A&amp;amp; r)
+    {
+        cout &amp;lt;&amp;lt; &amp;quot;copy A&amp;quot; &amp;lt;&amp;lt; endl;
+    }
+    A(const A&amp;amp;&amp;amp; r)
+    {
+        cout &amp;lt;&amp;lt; &amp;quot;&amp;amp;&amp;amp; copy A&amp;quot; &amp;lt;&amp;lt; endl;
+    }
+
+    A&amp;amp; operator=(const A&amp;amp; r)
+    {
+        cout &amp;lt;&amp;lt; &amp;quot;= A&amp;quot; &amp;lt;&amp;lt; endl;
+    }
+    A&amp;amp; operator=(const A&amp;amp;&amp;amp; r)
+    {
+        cout &amp;lt;&amp;lt; &amp;quot;&amp;amp;&amp;amp; = A&amp;quot; &amp;lt;&amp;lt; endl;
+    }
+    string name;
+};
+
+static A make_A()
+{
+    cout &amp;lt;&amp;lt; &amp;quot;&amp;quot;&amp;lt;&amp;lt;endl;
+    return A();
+}
+
+static void test_move()
+{
+    A aa = make_A();
+    A bb = std::move(aa);
+    A ee(bb);
+    A cc(std::move(aa));
+    A dd(make_A());
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;输出&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;new A
+&amp;amp;&amp;amp; copy A
+copy A
+&amp;amp;&amp;amp; copy A
+
+new A
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>c&#43;&#43;11 thread库</title>
+      <link>http://www.fpstop.com/cpp/thread_class/</link>
+      <pubDate>Tue, 20 Jun 2017 06:08:32 +0800</pubDate>
+      
+      <guid>http://www.fpstop.com/cpp/thread_class/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>gcore:给运行中的进程生成core文件</title>

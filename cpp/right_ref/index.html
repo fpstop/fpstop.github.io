@@ -14,12 +14,12 @@
     <link rel="alternate" type="application/rss+xml" title="RSS" href="http://www.fpstop.com//index.xml">
 
     
-    <title>持续集成 - 徐锦平的博客</title>
-    <meta property='og:title' content="持续集成 - 徐锦平的博客">
+    <title>c&#43;&#43;11 右值引用 - 徐锦平的博客</title>
+    <meta property='og:title' content="c&#43;&#43;11 右值引用 - 徐锦平的博客">
     <meta property="og:type" content="article">
     
 
-    <meta property="og:url" content="http://www.fpstop.com/categories/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90/">
+    <meta property="og:url" content="http://www.fpstop.com/cpp/right_ref/">
     
     
 
@@ -81,32 +81,148 @@
       <div class="container">
 
 
-<div class="list">
+
+<div class="single">
 
   <div class="row">
     <div class="col-md-8">
-      <header class="page-title">持续集成</header>
 
-      
-      <article class="li">
-  <header>
-    <div class="date">Thu, May 25, 2017</div>
-    <div class="title"><a href="http://www.fpstop.com/svn/linux_build_with_svn_info/">linux编译版本时日志中打印svn版本号</a></div>
-  </header>
-  <div class="body"><p>做游戏开发，有很多时候查bug，最后都是发现时因为测试没有替补丁。所以想，如果日志里能把svn当前的版本号打印出来多好，先排除版本问题。</p>
-</div>
+      <article class="single" itemscope="itemscope" itemtype="http://schema.org/Article">
 
-  
-  <footer>
-    <a href="http://www.fpstop.com/svn/linux_build_with_svn_info/" class="btn btn-default">Read More…</a>
-  </footer>
-  
-</article>
-<hr>
+        <meta itemprop="mainEntityOfPage"  itemType="https://schema.org/WebPage" content="http://www.fpstop.com/"/>
+        <meta itemprop="dateModified" content="2017-06-21T06:29:50&#43;08:00">
+        <meta itemprop="headline" content="c&#43;&#43;11 右值引用">
+        <meta itemprop="description" content="一直以来以为右值引用的误区终于搞懂了。
+">
+        <meta itemprop="url" content="http://www.fpstop.com/cpp/right_ref/">
+        <div itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
+          <meta itemprop="url" content="http://www.fpstop.com/images/default.jpg" />
+          <meta itemprop="width" content="800">
+          <meta itemprop="height" content="800">
+        </div>
+        <div itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+          <div itemprop="logo" itemscope itemtype="https://schema.org/ImageObject">
+            <meta itemprop="url" content="http://www.fpstop.com/images/logo.jpg">
+            <meta itemprop="width" content="100">
+            <meta itemprop="height" content="100">
+          </div>
+          <meta itemprop="name" content="徐锦平的博客">
+        </div>
+        <div itemprop="author" itemscope itemtype="https://schema.org/Person">
+          <meta itemprop="name" content="">
+        </div>
 
-      
-      
+        <header class="article-header">
+          <time itemprop="datePublished" pubdate="pubdate" datetime="2017-06-21T06:29:50&#43;08:00">Wed, Jun 21, 2017</time>
+          <h1 class="article-title">c&#43;&#43;11 右值引用</h1>
+        </header>
 
+        <div class="article-body" itemprop="articleBody">
+          
+
+<p>一直以来以为右值引用的误区终于搞懂了。</p>
+
+<h1 id="误区">误区</h1>
+
+<h2 id="误区一-右值引用是编译期通过指针实现的">误区一：右值引用是编译期通过指针实现的</h2>
+
+<p>原来以为右值引用是编译期给你完成的，自己不需要做任何事情，就可以实现高效，以为编译期是内部通过指针来实现的。</p>
+
+<p>右值引用好用，需要自己写<strong>右值引用构造</strong>和<strong>右值引用拷贝</strong>，当符合右值转移的条件时，会自动调用下面这两个函数，如果你不写的话，还是会调用拷贝构造函数。</p>
+
+<hr />
+
+<pre><code>A&amp; operator=(const A&amp;&amp; r)
+A(const A&amp;&amp; r)
+</code></pre>
+
+<p>当然stl里面的类都已经写好右值引用构造和右值引用拷贝。</p>
+
+<h2 id="右值引用后-右值不再析构">右值引用后，右值不再析构</h2>
+
+<p>这个误区产生的原因和上面类似，其实右值还是一个对象，还会正常析构，只不过析构时不再回收资源，资源已经被挪走。</p>
+
+<h1 id="右值引用的机制">右值引用的机制</h1>
+
+<p>右值引用调用的时机如下：</p>
+
+<ul>
+<li>参数为右值时。</li>
+<li>参数为左值，但是通过std::move转化为右值时。</li>
+</ul>
+
+<p>c++11 加入右值引用特性，是给你个机会，当以上两种情况满足其一时，可以调用你写的右值函数，如果你不写，就会调用普通的拷贝构造函数和赋值函数。</p>
+
+<h1 id="实验的小例子">实验的小例子</h1>
+
+<pre><code>class A
+{
+public:
+    A()
+    {
+        cout &lt;&lt; &quot;new A&quot; &lt;&lt; endl;
+    }
+    ~A()
+    {
+        cout &lt;&lt; &quot;del A&quot; &lt;&lt; endl;
+    }
+
+    A(const A&amp; r)
+    {
+        cout &lt;&lt; &quot;copy A&quot; &lt;&lt; endl;
+    }
+    A(const A&amp;&amp; r)
+    {
+        cout &lt;&lt; &quot;&amp;&amp; copy A&quot; &lt;&lt; endl;
+    }
+
+    A&amp; operator=(const A&amp; r)
+    {
+        cout &lt;&lt; &quot;= A&quot; &lt;&lt; endl;
+    }
+    A&amp; operator=(const A&amp;&amp; r)
+    {
+        cout &lt;&lt; &quot;&amp;&amp; = A&quot; &lt;&lt; endl;
+    }
+    string name;
+};
+
+static A make_A()
+{
+    cout &lt;&lt; &quot;&quot;&lt;&lt;endl;
+    return A();
+}
+
+static void test_move()
+{
+    A aa = make_A();
+    A bb = std::move(aa);
+    A ee(bb);
+    A cc(std::move(aa));
+    A dd(make_A());
+}
+</code></pre>
+
+<p>输出</p>
+
+<pre><code>new A
+&amp;&amp; copy A
+copy A
+&amp;&amp; copy A
+
+new A
+</code></pre>
+
+        </div>
+
+
+        <aside>
+          
+          
+          
+        </aside>
+
+      </article>
 
     </div>
     <div class="col-md-4">
@@ -188,6 +304,7 @@
   </div>
 
 </div>
+
       </div>
     </div>
 

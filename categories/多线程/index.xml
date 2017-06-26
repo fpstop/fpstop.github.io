@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>多线程 on 徐锦平的博客</title>
+    <link>http://www.fpstop.com/categories/%E5%A4%9A%E7%BA%BF%E7%A8%8B/</link>
+    <description>Recent content in 多线程 on 徐锦平的博客</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 20 Jun 2017 06:08:32 +0800</lastBuildDate>
+    <atom:link href="http://www.fpstop.com/categories/%E5%A4%9A%E7%BA%BF%E7%A8%8B/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>c&#43;&#43;11 thread库</title>
+      <link>http://www.fpstop.com/cpp/thread_class/</link>
+      <pubDate>Tue, 20 Jun 2017 06:08:32 +0800</pubDate>
+      
+      <guid>http://www.fpstop.com/cpp/thread_class/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
