@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="Hugo 0.16" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <link rel='stylesheet' href='//fonts.googleapis.com/css?family=Open+Sans|Marcellus+SC'>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/solarized_dark.min.css">
+    <link rel="stylesheet" href="http://www.fpstop.com/css/styles.css">
+    <link rel="stylesheet" href="http://www.fpstop.com/css/custom.css">
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="http://www.fpstop.com//index.xml">
+
+    
+    <title>libuv文档 翻译 - 徐锦平的博客</title>
+    <meta property='og:title' content="libuv文档 翻译 - 徐锦平的博客">
+    <meta property="og:type" content="article">
+    
+
+    <meta property="og:url" content="http://www.fpstop.com/third/libuv_doc/">
+    
+    
+
+  </head>
+
+  <body>
+
+    <header class="site">
+      <nav class="navbar navbar-default">
+        <div class="container">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="http://www.fpstop.com/">徐锦平的博客</a>
+          </div>
+
+          <div id="navbar" class="collapse navbar-collapse">
+            
+          </div>
+
+        </div>
+      </nav>
+	  
+
+	 <script>
+		var _hmt = _hmt || [];
+		(function() {
+		  var hm = document.createElement("script");
+		hm.src = "//hm.baidu.com/hm.js?d932a7da04ab8d1a98eb944bbe989c74";
+		  var s = document.getElementsByTagName("script")[0]; 
+		  s.parentNode.insertBefore(hm, s);
+		})();
+	</script>
+
+	  
+	<script>
+		(function(){
+			var bp = document.createElement('script');
+			var curProtocol = window.location.protocol.split(':')[0];
+			if (curProtocol === 'https') {
+				bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';       
+			}
+			else {
+				bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+			}
+			var s = document.getElementsByTagName("script")[0];
+			s.parentNode.insertBefore(bp, s);
+		})();
+	</script>
+	
+	
+    </header>
+
+    <div class="site">
+      <div class="container">
+
+
+
+<div class="single">
+
+  <div class="row">
+    <div class="col-md-8">
+
+      <article class="single" itemscope="itemscope" itemtype="http://schema.org/Article">
+
+        <meta itemprop="mainEntityOfPage"  itemType="https://schema.org/WebPage" content="http://www.fpstop.com/"/>
+        <meta itemprop="dateModified" content="2017-07-29T18:10:19&#43;08:00">
+        <meta itemprop="headline" content="libuv文档 翻译">
+        <meta itemprop="description" content="libuv的文档直接就是md的，哈哈
+">
+        <meta itemprop="url" content="http://www.fpstop.com/third/libuv_doc/">
+        <div itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
+          <meta itemprop="url" content="http://www.fpstop.com/images/default.jpg" />
+          <meta itemprop="width" content="800">
+          <meta itemprop="height" content="800">
+        </div>
+        <div itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+          <div itemprop="logo" itemscope itemtype="https://schema.org/ImageObject">
+            <meta itemprop="url" content="http://www.fpstop.com/images/logo.jpg">
+            <meta itemprop="width" content="100">
+            <meta itemprop="height" content="100">
+          </div>
+          <meta itemprop="name" content="徐锦平的博客">
+        </div>
+        <div itemprop="author" itemscope itemtype="https://schema.org/Person">
+          <meta itemprop="name" content="">
+        </div>
+
+        <header class="article-header">
+          <time itemprop="datePublished" pubdate="pubdate" datetime="2017-07-29T18:10:19&#43;08:00">Sat, Jul 29, 2017</time>
+          <h1 class="article-title">libuv文档 翻译</h1>
+        </header>
+
+        <div class="article-body" itemprop="articleBody">
+          
+
+<p>libuv的文档直接就是md的，哈哈</p>
+
+<p><img src="https://raw.githubusercontent.com/libuv/libuv/master/img/banner.png" alt="libuv" /></p>
+
+<h2 id="overview">Overview</h2>
+
+<p>libuv is a multi-platform support library with a focus on asynchronous I/O. It
+was primarily developed for use by <a href="http://nodejs.org">Node.js</a>, but it&rsquo;s also
+used by <a href="http://luvit.io/">Luvit</a>, <a href="http://julialang.org/">Julia</a>,
+<a href="https://github.com/saghul/pyuv">pyuv</a>, and <a href="https://github.com/libuv/libuv/wiki/Projects-that-use-libuv">others</a>.</p>
+
+<p>libuv是个多平台的库，专注异步IO。主要为了node.js 开发的。</p>
+
+<h2 id="feature-highlights">Feature highlights</h2>
+
+<h2 id="特色">特色</h2>
+
+<ul>
+<li><p>Full-featured event loop backed by epoll, kqueue, IOCP, event ports.</p></li>
+
+<li><p>支持全部事件循环，包括。。。</p></li>
+
+<li><p>Asynchronous TCP and UDP sockets</p></li>
+
+<li><p>异步tcp和udp</p></li>
+
+<li><p>Asynchronous DNS resolution</p></li>
+
+<li><p>异步dns解析（libevent也支持）</p></li>
+
+<li><p>Asynchronous file and file system operations</p></li>
+
+<li><p>异步文件和文件系统操作。</p></li>
+
+<li><p>File system events</p></li>
+
+<li><p>文件系统事件。</p></li>
+
+<li><p>ANSI escape code controlled TTY</p></li>
+
+<li><p>就是在控制台打印出彩色，高亮，粗体的输出，没啥用。</p></li>
+
+<li><p>IPC with socket sharing, using Unix domain sockets or named pipes (Windows)</p></li>
+
+<li><p>进程间通信（IPC），共享socket。基于unix 域socket或者命名管道。</p></li>
+
+<li><p>Child processes</p></li>
+
+<li><p>子进程</p></li>
+
+<li><p>Thread pool</p></li>
+
+<li><p>线程池</p></li>
+
+<li><p>Signal handling</p></li>
+
+<li><p>信号处理</p></li>
+
+<li><p>High resolution clock</p></li>
+
+<li><p>高精度时钟，不过c++11 已经支持了。</p></li>
+
+<li><p>Threading and synchronization primitives</p></li>
+
+<li><p>线程和同步原语。</p></li>
+</ul>
+
+<h2 id="versioning">Versioning</h2>
+
+<p>Starting with version 1.0.0 libuv follows the <a href="http://semver.org/">semantic versioning</a>
+scheme. The API change and backwards compatibility rules are those indicated by
+SemVer. libuv will keep a stable ABI across major releases.</p>
+
+<p>从1.0.0开始开始符合一个什么标准。</p>
+
+<h2 id="community">Community</h2>
+
+<ul>
+<li><a href="http://groups.google.com/group/libuv">Mailing list</a></li>
+<li><a href="http://webchat.freenode.net?channels=libuv&amp;uio=d4">IRC chatroom (#libuv@irc.freenode.org)</a></li>
+</ul>
+
+<h2 id="documentation">Documentation</h2>
+
+<h3 id="official-api-documentation">Official API documentation</h3>
+
+<p>Located in the docs/ subdirectory. It uses the <a href="http://sphinx-doc.org/">Sphinx</a>
+framework, which makes it possible to build the documentation in multiple
+formats.</p>
+
+<p>Show different supported building options:</p>
+
+<pre><code>$ make help
+</code></pre>
+
+<p>Build documentation as HTML:</p>
+
+<pre><code>$ make html
+</code></pre>
+
+<p>Build documentation as HTML and live reload it when it changes (this requires
+sphinx-autobuild to be installed and is only supported on Unix):</p>
+
+<pre><code>$ make livehtml
+</code></pre>
+
+<p>Build documentation as man pages:</p>
+
+<pre><code>$ make man
+</code></pre>
+
+<p>Build documentation as ePub:</p>
+
+<pre><code>$ make epub
+</code></pre>
+
+<p>NOTE: Windows users need to use make.bat instead of plain &lsquo;make&rsquo;.</p>
+
+<p>Documentation can be browsed online <a href="http://docs.libuv.org">here</a>.</p>
+
+<p>The <a href="https://github.com/libuv/libuv/tree/master/test">tests and benchmarks</a>
+also serve as API specification and usage examples.</p>
+
+<h3 id="other-resources">Other resources</h3>
+
+<ul>
+<li><a href="http://nikhilm.github.com/uvbook/">An Introduction to libuv</a>
+&mdash; An overview of libuv with tutorials.</li>
+<li><a href="http://www.youtube.com/watch?v=nGn60vDSxQ4">LXJS 2012 talk</a>
+&mdash; High-level introductory talk about libuv.</li>
+<li><a href="https://github.com/thlorenz/libuv-dox">libuv-dox</a>
+&mdash; Documenting types and methods of libuv, mostly by reading uv.h.</li>
+<li><a href="https://github.com/thlorenz/learnuv">learnuv</a>
+&mdash; Learn uv for fun and profit, a self guided workshop to libuv.</li>
+</ul>
+
+<p>These resources are not handled by libuv maintainers and might be out of
+date. Please verify it before opening new issues.</p>
+
+<h2 id="downloading">Downloading</h2>
+
+<p>libuv can be downloaded either from the
+<a href="https://github.com/libuv/libuv">GitHub repository</a>
+or from the <a href="http://dist.libuv.org/dist/">downloads site</a>.</p>
+
+<p>Starting with libuv 1.7.0, binaries for Windows are also provided. This is to
+be considered EXPERIMENTAL.</p>
+
+<p>Before verifying the git tags or signature files, importing the relevant keys
+is necessary. Key IDs are listed in the
+<a href="https://github.com/libuv/libuv/blob/master/MAINTAINERS.md">MAINTAINERS</a>
+file, but are also available as git blob objects for easier use.</p>
+
+<p>Importing a key the usual way:</p>
+
+<pre><code>$ gpg --keyserver pool.sks-keyservers.net \
+  --recv-keys AE9BC059
+</code></pre>
+
+<p>Importing a key from a git blob object:</p>
+
+<pre><code>$ git show pubkey-saghul | gpg --import
+</code></pre>
+
+<h3 id="verifying-releases">Verifying releases</h3>
+
+<p>Git tags are signed with the developer&rsquo;s key, they can be verified as follows:</p>
+
+<pre><code>$ git verify-tag v1.6.1
+</code></pre>
+
+<p>Starting with libuv 1.7.0, the tarballs stored in the
+<a href="http://dist.libuv.org/dist/">downloads site</a> are signed and an accompanying
+signature file sit alongside each. Once both the release tarball and the
+signature file are downloaded, the file can be verified as follows:</p>
+
+<pre><code>$ gpg --verify libuv-1.7.0.tar.gz.sign
+</code></pre>
+
+<h2 id="build-instructions">Build Instructions</h2>
+
+<p>For GCC there are two build methods: via autotools or via <a href="http://code.google.com/p/gyp/">GYP</a>.
+GYP is a meta-build system which can generate MSVS, Makefile, and XCode
+backends. It is best used for integration into other projects.</p>
+
+<p>To build with autotools:</p>
+
+<pre><code>$ sh autogen.sh
+$ ./configure
+$ make
+$ make check
+$ make install
+</code></pre>
+
+<h3 id="windows">Windows</h3>
+
+<p>First, <a href="https://www.python.org/downloads/">Python</a> 2.6 or 2.7 must be installed as it is required by <a href="http://code.google.com/p/gyp/">GYP</a>.
+If python is not in your path, set the environment variable <code>PYTHON</code> to its
+location. For example: <code>set PYTHON=C:\Python27\python.exe</code></p>
+
+<p>To build with Visual Studio, launch a git shell (e.g. Cmd or PowerShell)
+and run vcbuild.bat which will checkout the GYP code into build/gyp and
+generate uv.sln as well as related project files.</p>
+
+<p>To have GYP generate build script for another system, checkout GYP into the
+project tree manually:</p>
+
+<pre><code>$ git clone https://chromium.googlesource.com/external/gyp.git build/gyp
+</code></pre>
+
+<h3 id="unix">Unix</h3>
+
+<p>For Debug builds (recommended) run:</p>
+
+<pre><code>$ ./gyp_uv.py -f make
+$ make -C out
+</code></pre>
+
+<p>For Release builds run:</p>
+
+<pre><code>$ ./gyp_uv.py -f make
+$ BUILDTYPE=Release make -C out
+</code></pre>
+
+<p>Run <code>./gyp_uv.py -f make -Dtarget_arch=x32</code> to build <a href="https://en.wikipedia.org/wiki/X32_ABI">x32</a> binaries.</p>
+
+<h3 id="os-x">OS X</h3>
+
+<p>Run:</p>
+
+<pre><code>$ ./gyp_uv.py -f xcode
+$ xcodebuild -ARCHS=&quot;x86_64&quot; -project uv.xcodeproj \
+     -configuration Release -target All
+</code></pre>
+
+<p>Using Homebrew:</p>
+
+<pre><code>$ brew install --HEAD libuv
+</code></pre>
+
+<p>Note to OS X users:</p>
+
+<p>Make sure that you specify the architecture you wish to build for in the
+&ldquo;ARCHS&rdquo; flag. You can specify more than one by delimiting with a space
+(e.g. &ldquo;x86_64 i386&rdquo;).</p>
+
+<h3 id="android">Android</h3>
+
+<p>Run:</p>
+
+<pre><code>$ source ./android-configure NDK_PATH gyp
+$ make -C out
+</code></pre>
+
+<p>Note for UNIX users: compile your project with <code>-D_LARGEFILE_SOURCE</code> and
+<code>-D_FILE_OFFSET_BITS=64</code>. GYP builds take care of that automatically.</p>
+
+<h3 id="using-ninja">Using Ninja</h3>
+
+<p>To use ninja for build on ninja supported platforms, run:</p>
+
+<pre><code>$ ./gyp_uv.py -f ninja
+$ ninja -C out/Debug     #for debug build OR
+$ ninja -C out/Release
+</code></pre>
+
+<h3 id="running-tests">Running tests</h3>
+
+<p>Run:</p>
+
+<pre><code>$ ./gyp_uv.py -f make
+$ make -C out
+$ ./out/Debug/run-tests
+</code></pre>
+
+<h2 id="supported-platforms">Supported Platforms</h2>
+
+<p>Microsoft Windows operating systems since Windows XP SP2. It can be built
+with either Visual Studio or MinGW. Consider using
+<a href="http://www.microsoft.com/visualstudio/eng/products/visual-studio-2010-express">Visual Studio Express 2010</a> or later if you do not have a full Visual
+Studio license.</p>
+
+<p>Linux using the GCC toolchain.</p>
+
+<p>OS X using the GCC or XCode toolchain.</p>
+
+<p>Solaris 121 and later using GCC toolchain.</p>
+
+<p>AIX 6 and later using GCC toolchain (see notes).</p>
+
+<h3 id="aix-notes">AIX Notes</h3>
+
+<p>AIX support for filesystem events requires the non-default IBM <code>bos.ahafs</code>
+package to be installed.  This package provides the AIX Event Infrastructure
+that is detected by <code>autoconf</code>.
+<a href="http://www.ibm.com/developerworks/aix/library/au-aix_event_infrastructure/">IBM documentation</a>
+describes the package in more detail.</p>
+
+<p>AIX support for filesystem events is not compiled when building with <code>gyp</code>.</p>
+
+<h2 id="patches">Patches</h2>
+
+<p>See the <a href="https://github.com/libuv/libuv/blob/master/CONTRIBUTING.md">guidelines for contributing</a>.</p>
+
+        </div>
+
+
+        <aside>
+          
+          
+          
+        </aside>
+
+      </article>
+
+    </div>
+    <div class="col-md-4">
+      
+<aside class="site">
+
+
+  
+  <div class="panel panel-default">
+
+    <div class="list-group">
+      
+      <a href="http://www.fpstop.com/categories/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B" class="list-group-item">网络编程</a>
+      
+      <a href="http://www.fpstop.com/categories/c&#43;&#43;11" class="list-group-item">c&#43;&#43;11</a>
+      
+      <a href="http://www.fpstop.com/categories/linux" class="list-group-item">linux</a>
+      
+      <a href="http://www.fpstop.com/categories/redis" class="list-group-item">redis</a>
+      
+      <a href="http://www.fpstop.com/categories/gcc" class="list-group-item">gcc</a>
+      
+      <a href="http://www.fpstop.com/categories/libevent" class="list-group-item">libevent</a>
+      
+      <a href="http://www.fpstop.com/categories/libuv" class="list-group-item">libuv</a>
+      
+      <a href="http://www.fpstop.com/categories/protobuf" class="list-group-item">protobuf</a>
+      
+      <a href="http://www.fpstop.com/categories/%E5%A4%9A%E7%BA%BF%E7%A8%8B" class="list-group-item">多线程</a>
+      
+      <a href="http://www.fpstop.com/categories/%E6%80%9D%E8%80%83" class="list-group-item">思考</a>
+      
+    </div>
+  </div>
+  
+  <div class="panel panel-default">
+
+    <div class="list-group">
+      
+    </div>
+  </div>
+  
+  
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">最近更新</h2>
+    </div>
+    <div class="list-group">
+      
+      <a href="http://www.fpstop.com/third/libevent_doc/" class="list-group-item">libevent 官方文档</a>
+      
+      <a href="http://www.fpstop.com/third/libuv_doc/" class="list-group-item">libuv文档 翻译</a>
+      
+      <a href="http://www.fpstop.com/cpp/right_ref/" class="list-group-item">c&#43;&#43;11 右值引用</a>
+      
+      <a href="http://www.fpstop.com/cpp/thread_class/" class="list-group-item">c&#43;&#43;11 thread库</a>
+      
+      <a href="http://www.fpstop.com/linux/gcore/" class="list-group-item">gcore:给运行中的进程生成core文件</a>
+      
+      <a href="http://www.fpstop.com/linux/fstack-protector-strong/" class="list-group-item">GCC中的堆栈保护机制</a>
+      
+      <a href="http://www.fpstop.com/linux/signal/" class="list-group-item">日不落的服务器-linux下利用信号捕获崩溃</a>
+      
+      <a href="http://www.fpstop.com/cpp/shared_ptr/" class="list-group-item">智能指针:指向基类的智能指针与指向子类的智能指针转换</a>
+      
+      <a href="http://www.fpstop.com/svn/linux_build_with_svn_info/" class="list-group-item">linux编译版本时日志中打印svn版本号</a>
+      
+      <a href="http://www.fpstop.com/third/protobuf_string/" class="list-group-item">protobuf的DebugString方法，汉字乱码</a>
+      
+    </div>
+  </div>
+
+  
+
+</aside>
+
+
+    </div>
+  </div>
+
+</div>
+
+      </div>
+    </div>
+
+    <footer class="site">
+      <div class="container">
+        <p>&copy; 2017 徐锦平的博客</p>
+        <p>Powered by fpstop.</p>
+      </div>
+    </footer>
+
+    <script src="//code.jquery.com/jquery-2.2.1.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+
+
+  </body>
+</html>
+
